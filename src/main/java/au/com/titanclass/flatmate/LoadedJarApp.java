@@ -8,7 +8,8 @@ class LoadedJarApp {
   final ClassLoader classLoader;
   final String mainClass;
 
-  LoadedJarApp(int id, JarApp jarApp, ClassLoader classLoader, String mainClass) {
+  LoadedJarApp(
+      final int id, final JarApp jarApp, final ClassLoader classLoader, final String mainClass) {
     this.id = id;
     this.jarApp = jarApp;
     this.classLoader = classLoader;
@@ -31,10 +32,10 @@ class LoadedJarApp {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    LoadedJarApp that = (LoadedJarApp) o;
+    final LoadedJarApp that = (LoadedJarApp) o;
     return id == that.id
         && Objects.equals(jarApp, that.jarApp)
         && Objects.equals(classLoader, that.classLoader)
@@ -43,7 +44,6 @@ class LoadedJarApp {
 
   @Override
   public int hashCode() {
-
     return Objects.hash(id, jarApp, classLoader, mainClass);
   }
 }

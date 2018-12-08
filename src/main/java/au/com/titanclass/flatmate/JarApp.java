@@ -21,10 +21,10 @@ class JarApp {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    JarApp jarApp = (JarApp) o;
+    final JarApp jarApp = (JarApp) o;
     return Objects.equals(path, jarApp.path)
         && Objects.equals(properties, jarApp.properties)
         && Objects.equals(args, jarApp.args);
@@ -32,7 +32,6 @@ class JarApp {
 
   @Override
   public int hashCode() {
-
     return Objects.hash(path, properties, args);
   }
 }
