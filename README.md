@@ -1,3 +1,5 @@
+*** EXPERIMENTAL ***
+
 # flatmate
 
 ## Overview
@@ -42,3 +44,5 @@ sbt package
 ## Releasing
 
 (TODO)
+
+(c)opyright 2018, Titan Class P/L

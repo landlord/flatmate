@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Titan Class P/L, 2018
+ */
+
 package au.com.titanclass.flatmate;
 
 import java.util.Objects;
