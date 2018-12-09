@@ -20,7 +20,7 @@ public class App {
     final Optional<List<JarApp>> maybeJarApps = Args.parse(args);
 
     if (!maybeJarApps.isPresent()) {
-      System.out.println("usage: [--app <jar> [-Dkey=value]... -- [<arg>]... --]...");
+      System.out.println("usage: [<jar> [-Dkey=value]... -- [<arg>]... --]...");
       System.exit(EXIT_USAGE);
       return;
     }
