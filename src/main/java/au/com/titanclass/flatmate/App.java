@@ -31,9 +31,9 @@ public class App {
 
     final List<LoadedJarApp> entries = classLoadersWithMainClass(rootClassLoader, jarApps);
 
-    Properties systemProperties = System.getProperties();
+    final Properties systemProperties = System.getProperties();
 
-    ThreadGroupProperties threadGroupProperties = new ThreadGroupProperties(systemProperties);
+    final ThreadGroupProperties threadGroupProperties = new ThreadGroupProperties(systemProperties);
 
     System.setProperties(threadGroupProperties);
 
@@ -77,7 +77,7 @@ public class App {
     }
   }
 
-  private static String threadGroupName(LoadedJarApp jarApp) {
+  private static String threadGroupName(final LoadedJarApp jarApp) {
     return "flatmate-"
         + jarApp.id
         + "-"
