@@ -11,6 +11,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 public class App {
+
   private static final List<JarApp> jarApps = new ArrayList<>();
   // @TODO parse args instead of hardcoded static block below
   static {
@@ -35,6 +36,11 @@ public class App {
             new HashMap<>(),
             new String[] {}));
   }
+
+  private static final int EXIT_ILLEGAL_ACCESS = 140;
+  private static final int EXIT_NO_SUCH_METHOD = 141;
+  private static final int EXIT_INVOCATION_TARGET = 142;
+  private static final int EXIT_CLASS_NOT_FOUND = 143;
 
   public static void main(final String[] args) {
     final ClassLoader rootClassLoader = App.class.getClassLoader();
@@ -65,34 +71,23 @@ public class App {
                   final Class<?> clazz = entry.classLoader.loadClass(entry.mainClass);
                   final Method mainMethod = clazz.getMethod("main", String[].class);
                   mainMethod.invoke(null, (Object) entry.jarApp.args);
-
-                  // @TODO mechanism to rethrow exceptions below, perhaps on another thread, instead
-                  // of print like that
                 } catch (final IllegalAccessException e) {
-                  e.printStackTrace();
-                  System.exit(140);
+                  System.exit(EXIT_ILLEGAL_ACCESS);
                 } catch (final NoSuchMethodException e) {
-                  e.printStackTrace();
-                  System.exit(141);
+                  System.exit(EXIT_NO_SUCH_METHOD);
                 } catch (final InvocationTargetException e) {
-                  e.printStackTrace();
-                  System.exit(142);
+                  System.exit(EXIT_INVOCATION_TARGET);
                 } catch (final ClassNotFoundException e) {
-                  e.printStackTrace();
-                  System.exit(143);
+                  System.exit(EXIT_CLASS_NOT_FOUND);
                 }
+
+                // other exceptions simply cause the "main" thread to die.
+                // we don't want to exit as the JVM doesn't exit
+                // in that case either (assuming other threads running)
               });
 
       jarThread.setName(jarThreadGroup.getName() + "-main");
       jarThread.setContextClassLoader(entry.classLoader);
-      jarThread.setUncaughtExceptionHandler(
-          (thread, throwable) -> {
-            throwable.printStackTrace();
-            // @TODO mechanism to rethrow exception above, perhaps on another thread, instead of
-            // print like that
-            System.exit(149);
-          });
-
       jarThread.start();
     }
   }
