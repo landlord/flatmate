@@ -5,44 +5,28 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 public class App {
-
-  private static final List<JarApp> jarApps = new ArrayList<>();
-  // @TODO parse args instead of hardcoded static block below
-  static {
-    jarApps.add(
-        new JarApp(
-            Paths.get(
-                "/home/longshorej/work/farmco/lora-device-provisioner/backend/iox-sss/target/lora-device-provisioner-iox-sss-0.1.0-SNAPSHOT.jar"),
-            new HashMap<>(),
-            new String[] {}));
-
-    jarApps.add(
-        new JarApp(
-            Paths.get(
-                "/home/longshorej/work/farmco/testone/target/scala-2.12/testone-assembly-0.1.0-SNAPSHOT.jar"),
-            new HashMap<>(),
-            new String[] {}));
-
-    jarApps.add(
-        new JarApp(
-            Paths.get(
-                "/home/longshorej/work/farmco/testtwo/target/scala-2.12/testtwo-assembly-0.1.0-SNAPSHOT.jar"),
-            new HashMap<>(),
-            new String[] {}));
-  }
-
+  private static final int EXIT_USAGE = 1;
   private static final int EXIT_ILLEGAL_ACCESS = 140;
   private static final int EXIT_NO_SUCH_METHOD = 141;
   private static final int EXIT_INVOCATION_TARGET = 142;
   private static final int EXIT_CLASS_NOT_FOUND = 143;
 
   public static void main(final String[] args) {
+    final Optional<List<JarApp>> maybeJarApps = Args.parse(args);
+
+    if (!maybeJarApps.isPresent()) {
+      System.out.println("usage: [--app <jar> [-Dkey=value]... -- [<arg>]... --]...");
+      System.exit(EXIT_USAGE);
+      return;
+    }
+
+    final List<JarApp> jarApps = maybeJarApps.get();
+
     final ClassLoader rootClassLoader = App.class.getClassLoader();
 
     final List<LoadedJarApp> entries = classLoadersWithMainClass(rootClassLoader, jarApps);
@@ -61,7 +45,7 @@ public class App {
               () -> {
                 final Properties props = new Properties(systemProperties);
 
-                for (Map.Entry<String, String> propertyEntry : entry.jarApp.properties.entrySet()) {
+                for (Map.Entry<String, String> propertyEntry : entry.jarApp.properties) {
                   props.put(propertyEntry.getKey(), propertyEntry.getValue());
                 }
 
@@ -70,7 +54,8 @@ public class App {
                 try {
                   final Class<?> clazz = entry.classLoader.loadClass(entry.mainClass);
                   final Method mainMethod = clazz.getMethod("main", String[].class);
-                  mainMethod.invoke(null, (Object) entry.jarApp.args);
+                  final String[] mainArgs = entry.jarApp.args.toArray(new String[] {});
+                  mainMethod.invoke(null, (Object) mainArgs);
                 } catch (final IllegalAccessException e) {
                   System.exit(EXIT_ILLEGAL_ACCESS);
                 } catch (final NoSuchMethodException e) {

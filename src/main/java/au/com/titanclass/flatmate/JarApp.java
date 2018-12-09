@@ -1,15 +1,17 @@
 package au.com.titanclass.flatmate;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 class JarApp {
   final Path path;
-  final Map<String, String> properties;
-  final String[] args;
+  final List<Map.Entry<String, String>> properties;
+  final List<String> args;
 
-  JarApp(final Path path, final Map<String, String> properties, final String[] args) {
+  JarApp(
+      final Path path, final List<Map.Entry<String, String>> properties, final List<String> args) {
     this.path = path;
     this.properties = properties;
     this.args = args;
