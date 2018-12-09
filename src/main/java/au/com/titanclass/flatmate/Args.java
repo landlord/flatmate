@@ -11,22 +11,18 @@ import java.util.*;
  * <p>--app myapp.jar -- argone argtwo --
  */
 class Args {
-  private static final List<JarApp> jApps = new ArrayList<>();
-
   private enum Mode {
     JAR,
     PROPS,
     ARGS
-  };
+  }
 
   static Optional<List<JarApp>> parse(final String[] args) {
     Mode mode = Mode.JAR;
     final List<JarApp> jarApps = new ArrayList<>();
     JarApp jarApp = null;
 
-    for (int i = 0; i < args.length; i++) {
-      final String arg = args[i];
-
+    for (final String arg : args) {
       switch (mode) {
         case JAR:
           jarApp = new JarApp(Paths.get(arg), new ArrayList<>(), new ArrayList<>());

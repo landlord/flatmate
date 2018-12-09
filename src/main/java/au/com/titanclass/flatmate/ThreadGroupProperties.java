@@ -15,24 +15,6 @@ class ThreadGroupProperties extends Properties {
     this.systemProperties = systemProperties;
   }
 
-  Properties get() {
-    ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-
-    while (true) {
-      if (threadGroup == null) {
-        return systemProperties;
-      } else {
-        final Properties props = byThreadGroup.get(threadGroup);
-
-        if (props == null) {
-          threadGroup = threadGroup.getParent();
-        } else {
-          return props;
-        }
-      }
-    }
-  }
-
   void register(final Properties props) {
     final ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
 
@@ -134,5 +116,23 @@ class ThreadGroupProperties extends Properties {
   @Override
   public Collection<Object> values() {
     return get().values();
+  }
+
+  private Properties get() {
+    ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+
+    while (true) {
+      if (threadGroup == null) {
+        return systemProperties;
+      } else {
+        final Properties props = byThreadGroup.get(threadGroup);
+
+        if (props == null) {
+          threadGroup = threadGroup.getParent();
+        } else {
+          return props;
+        }
+      }
+    }
   }
 }
