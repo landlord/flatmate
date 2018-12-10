@@ -29,3 +29,4 @@ dockerCommands := Seq(
   Cmd("FROM", "scratch"),
   Cmd("COPY", "opt/docker", "/opt/docker")
 )
+dockerUsername := Some("titanclass")

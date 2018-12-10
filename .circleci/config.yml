@@ -1,0 +1,60 @@
+version: 2
+jobs:
+  # `build` builds the project and runs its tests
+  build:
+    working_directory: ~/project
+    docker:
+      - image: circleci/openjdk:8-jdk-node-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          key: sbt-cache-1
+      - run:
+          name: Compile & Test
+          command: |
+            sbt clean compile test:compile test
+      - save_cache:
+          key: sbt-cache-1
+          paths:
+            - "~/.ivy2/cache"
+            - "~/.sbt"
+            - "~/.m2"
+
+  # `publish` builds the project and pushes it to DockerHub.
+  # It's run whenever a tag starting with 'v' is pushed.
+  publish:
+    working_directory: ~/project
+    docker:
+      - image: circleci/openjdk:8-jdk-node-browsers
+    steps:
+      - checkout
+      - setup_remote_docker
+      - restore_cache:
+          key: sbt-cache-1
+      - run:
+          name: Compile & Publish
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+            sbt clean compile test:compile test docker:publish
+      - save_cache:
+          key: sbt-cache-1
+          paths:
+            - "~/.ivy2/cache"
+            - "~/.sbt"
+            - "~/.m2"
+workflows:
+  version: 2
+
+  build:
+    jobs:
+      - build
+
+  publish:
+    jobs:
+      - publish:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
