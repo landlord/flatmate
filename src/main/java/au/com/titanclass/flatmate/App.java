@@ -12,6 +12,7 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 public class App {
   private static final int EXIT_USAGE = 1;
@@ -35,9 +36,13 @@ public class App {
 
     final List<LoadedJarApp> entries = classLoadersWithMainClass(rootClassLoader, jarApps);
 
-    final Properties systemProperties = System.getProperties();
+    final Map<Object, Object> systemPropertyMap =
+        System.getProperties()
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    final ThreadGroupProperties threadGroupProperties = new ThreadGroupProperties(systemProperties);
+    final ThreadGroupProperties threadGroupProperties = new ThreadGroupProperties();
 
     System.setProperties(threadGroupProperties);
 
@@ -47,7 +52,8 @@ public class App {
           new Thread(
               jarThreadGroup,
               () -> {
-                final Properties props = new Properties(systemProperties);
+                final Properties props = new Properties();
+                props.putAll(systemPropertyMap);
 
                 for (Map.Entry<String, String> propertyEntry : entry.jarApp.properties) {
                   props.put(propertyEntry.getKey(), propertyEntry.getValue());
