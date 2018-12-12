@@ -36,13 +36,15 @@ public class App {
 
     final List<LoadedJarApp> entries = classLoadersWithMainClass(rootClassLoader, jarApps);
 
+    final Properties systemProperties = System.getProperties();
+
     final Map<Object, Object> systemPropertyMap =
-        System.getProperties()
+        systemProperties
             .entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    final ThreadGroupProperties threadGroupProperties = new ThreadGroupProperties();
+    final ThreadGroupProperties threadGroupProperties = new ThreadGroupProperties(systemProperties);
 
     System.setProperties(threadGroupProperties);
 
