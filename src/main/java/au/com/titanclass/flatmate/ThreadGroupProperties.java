@@ -12,9 +12,11 @@ import java.util.function.BiConsumer;
 
 class ThreadGroupProperties extends Properties {
   private final ConcurrentHashMap<ThreadGroup, Properties> byThreadGroup;
+  private final Properties systemProperties;
 
-  ThreadGroupProperties() {
+  ThreadGroupProperties(final Properties systemProperties) {
     this.byThreadGroup = new ConcurrentHashMap<>();
+    this.systemProperties = systemProperties;
   }
 
   void register(final Properties props) {
@@ -125,7 +127,7 @@ class ThreadGroupProperties extends Properties {
 
     while (true) {
       if (threadGroup == null) {
-        return System.getProperties();
+        return systemProperties;
       } else {
         final Properties props = byThreadGroup.get(threadGroup);
 
