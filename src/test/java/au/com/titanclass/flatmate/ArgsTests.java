@@ -35,21 +35,33 @@ public class ArgsTests {
         Optional.of(
             new ArrayList<>(
                 Arrays.asList(
-                    new JarApp(Paths.get("test.jar"), new ArrayList<>(), new ArrayList<>())))),
+                    new JarApp(
+                        Paths.get("test.jar"),
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        new ArrayList<>())))),
         Args.parse(new String[] {"test.jar"}));
 
     assertEquals(
         Optional.of(
             new ArrayList<>(
                 Arrays.asList(
-                    new JarApp(Paths.get("test.jar"), new ArrayList<>(), new ArrayList<>())))),
+                    new JarApp(
+                        Paths.get("test.jar"),
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        new ArrayList<>())))),
         Args.parse(new String[] {"test.jar", "--"}));
 
     assertEquals(
         Optional.of(
             new ArrayList<>(
                 Arrays.asList(
-                    new JarApp(Paths.get("test.jar"), new ArrayList<>(), new ArrayList<>())))),
+                    new JarApp(
+                        Paths.get("test.jar"),
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        new ArrayList<>())))),
         Args.parse(new String[] {"test.jar", "--", "--"}));
   }
 
@@ -64,6 +76,7 @@ public class ArgsTests {
                         Arrays.asList(
                             new AbstractMap.SimpleEntry<>("key1", "1234"),
                             new AbstractMap.SimpleEntry<>("key2", "1234")),
+                        new ArrayList<>(),
                         new ArrayList<>())))),
         Args.parse(new String[] {"test.jar", "-Dkey1=1234", "-Dkey2=1234"}));
 
@@ -76,6 +89,7 @@ public class ArgsTests {
                         Arrays.asList(
                             new AbstractMap.SimpleEntry<>("key1", "1234"),
                             new AbstractMap.SimpleEntry<>("key2", "1234")),
+                        new ArrayList<>(),
                         new ArrayList<>())))),
         Args.parse(new String[] {"test.jar", "-Dkey1=1234", "-Dkey2=1234", "--"}));
   }
@@ -89,7 +103,8 @@ public class ArgsTests {
                     new JarApp(
                         Paths.get("test.jar"),
                         Arrays.asList(),
-                        Arrays.asList("argOne", "argTwo"))))),
+                        Arrays.asList("argOne", "argTwo"),
+                        new ArrayList<>())))),
         Args.parse(new String[] {"test.jar", "--", "argOne", "argTwo"}));
 
     assertEquals(
@@ -101,7 +116,8 @@ public class ArgsTests {
                         Arrays.asList(
                             new AbstractMap.SimpleEntry<>("key1", "1234"),
                             new AbstractMap.SimpleEntry<>("key2", "1234")),
-                        Arrays.asList("argOne", "argTwo"))))),
+                        Arrays.asList("argOne", "argTwo"),
+                        new ArrayList<>())))),
         Args.parse(
             new String[] {
               "test.jar", "-Dkey1=1234", "-Dkey2=1234", "--", "argOne", "argTwo", "--"
@@ -114,8 +130,66 @@ public class ArgsTests {
         Optional.of(
             new ArrayList<JarApp>(
                 Arrays.asList(
-                    new JarApp(Paths.get("test.jar"), Arrays.asList(), new ArrayList<>()),
-                    new JarApp(Paths.get("test2.jar"), Arrays.asList(), new ArrayList<>())))),
+                    new JarApp(
+                        Paths.get("test.jar"),
+                        Arrays.asList(),
+                        new ArrayList<>(),
+                        new ArrayList<>()),
+                    new JarApp(
+                        Paths.get("test2.jar"),
+                        Arrays.asList(),
+                        new ArrayList<>(),
+                        new ArrayList<>())))),
         Args.parse(new String[] {"test.jar", "--", "--", "test2.jar", "--", "--"}));
+  }
+
+  @Test
+  public void testReadinessChecks() {
+    assertEquals(
+        Optional.of(
+            new ArrayList<JarApp>(
+                Arrays.asList(
+                    new JarApp(
+                        Paths.get("test.jar"),
+                        Arrays.asList(),
+                        new ArrayList<>(),
+                        Arrays.asList(new TcpReadinessCheck("localhost", 4000))),
+                    new JarApp(
+                        Paths.get("test2.jar"),
+                        Arrays.asList(),
+                        new ArrayList<>(),
+                        Arrays.asList(
+                            new TcpReadinessCheck("localhost", 5000),
+                            new TcpReadinessCheck("localhost", 6000)))))),
+        Args.parse(
+            new String[] {
+              "test.jar",
+              "-ready",
+              "tcp://localhost:4000",
+              "--",
+              "--",
+              "test2.jar",
+              "-ready",
+              "tcp://localhost:5000",
+              "-ready",
+              "tcp://localhost:6000",
+              "--",
+              "--"
+            }));
+
+    assertEquals(
+        Optional.empty(),
+        Args.parse(new String[] {"test.jar", "-ready", "file:///some/file", "--", "--"}));
+
+    assertEquals(
+        Optional.empty(),
+        Args.parse(new String[] {"test.jar", "-ready", "tcp://host:badport", "--", "--"}));
+
+    assertEquals(
+        Optional.empty(),
+        Args.parse(new String[] {"test.jar", "-ready", "tcp://:1234", "--", "--"}));
+
+    assertEquals(
+        Optional.empty(), Args.parse(new String[] {"test.jar", "-ready", "tcp://", "--", "--"}));
   }
 }
