@@ -25,17 +25,31 @@ class JarApp {
   final Path path;
   final List<Map.Entry<String, String>> properties;
   final List<String> args;
+  final List<ReadinessCheck> readinessChecks;
 
   JarApp(
-      final Path path, final List<Map.Entry<String, String>> properties, final List<String> args) {
+      final Path path,
+      final List<Map.Entry<String, String>> properties,
+      final List<String> args,
+      final List<ReadinessCheck> readinessChecks) {
     this.path = path;
     this.properties = properties;
     this.args = args;
+    this.readinessChecks = readinessChecks;
   }
 
   @Override
   public String toString() {
-    return "JarApp{" + "path=" + path + ", properties=" + properties + ", args=" + args + '}';
+    return "JarApp{"
+        + "path="
+        + path
+        + ", properties="
+        + properties
+        + ", args="
+        + args
+        + ", readinessChecks="
+        + readinessChecks
+        + '}';
   }
 
   @Override
@@ -45,11 +59,12 @@ class JarApp {
     final JarApp jarApp = (JarApp) o;
     return Objects.equals(path, jarApp.path)
         && Objects.equals(properties, jarApp.properties)
-        && Objects.equals(args, jarApp.args);
+        && Objects.equals(args, jarApp.args)
+        && Objects.equals(readinessChecks, jarApp.readinessChecks);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(path, properties, args);
+    return Objects.hash(path, properties, args, readinessChecks);
   }
 }

@@ -34,14 +34,18 @@ class Args {
   }
 
   static Optional<List<JarApp>> parse(final String[] args) {
+    final Iterator<String> argsIterator = Arrays.stream(args).iterator();
+
     Mode mode = Mode.JAR;
     final List<JarApp> jarApps = new ArrayList<>();
     JarApp jarApp = null;
 
-    for (final String arg : args) {
+    while (argsIterator.hasNext()) {
+      String arg = argsIterator.next();
       switch (mode) {
         case JAR:
-          jarApp = new JarApp(Paths.get(arg), new ArrayList<>(), new ArrayList<>());
+          jarApp =
+              new JarApp(Paths.get(arg), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
           mode = Mode.PROPS;
           break;
 
@@ -62,6 +66,26 @@ class Args {
             }
 
             jarApp.properties.add(new AbstractMap.SimpleEntry<>(key, value));
+          } else if (arg.startsWith("-ready") && argsIterator.hasNext()) {
+            final String tcpScheme = "tcp://";
+            final String readinessCheck = argsIterator.next();
+
+            if (!readinessCheck.startsWith(tcpScheme)) {
+              return Optional.empty();
+            }
+
+            final String[] readinessCheckParts =
+                readinessCheck.substring(tcpScheme.length()).split(":", 2);
+
+            if (readinessCheckParts.length != 2
+                || readinessCheckParts[0].isEmpty()
+                || !readinessCheckParts[1].matches("^[0-9]+$")) {
+              return Optional.empty();
+            }
+
+            jarApp.readinessChecks.add(
+                new TcpReadinessCheck(
+                    readinessCheckParts[0], Integer.parseInt(readinessCheckParts[1])));
           } else {
             return Optional.empty();
           }

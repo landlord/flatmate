@@ -38,13 +38,21 @@ which yields:
 [INFO] [12/08/2018 18:58:22.720] [ForkJoinPool.commonPool-worker-1] [DeviceProvisionerServer(akka://deviceprovisioner)] Server listening on /127.0.0.1:9871
 ```
 
+Flatmate includes a readiness feature that can wait to start applications based on the binding of a TCP socket. The following will only start the program contained in `bar.jar` once `foo.jar` binds to port 9870:
+
+```bash
+java -jar ~/work/farmco/roommate/target/flatmate-1.0.0-SNAPSHOT.jar \
+  ~/work/farmco/lora-device-provisioner/backend/iox-sss/target/lora-device-provisioner-iox-sss-0.1.0-SNAPSHOT.jar -Dstreambed.http-server.bind.port=9870 -- -- \
+  ~/work/farmco/lora-device-provisioner/backend/iox-sss/target/lora-device-provisioner-iox-sss-0.1.0-SNAPSHOT.jar -ready tcp://localhost:9870 -Dstreambed.http-server.bind.port=9871
+```
+
 ### Building a JAR
 
 ```bash
 sbt package
 ```
 
-## Contribution policy ##
+## Contribution policy
 
 Contributions via GitHub pull requests are gladly accepted from their original author. Along with
 any pull requests, please state that the contribution is your original work and that you license
@@ -53,7 +61,7 @@ explicitly, by submitting any copyrighted material via pull request, email, or o
 agree to license the material under the project's open source license and warrant that you have the
 legal authority to do so.
 
-## License ##
+## License
 
 This code is open source software licensed under the
 [Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0) license.

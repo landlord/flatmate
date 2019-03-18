@@ -32,12 +32,13 @@ public class App {
   private static final int EXIT_NO_SUCH_METHOD = 141;
   private static final int EXIT_INVOCATION_TARGET = 142;
   private static final int EXIT_CLASS_NOT_FOUND = 143;
+  private static final int EXIT_READINESS_CHECK_FAILED = 144;
 
   public static void main(final String[] args) {
     final Optional<List<JarApp>> maybeJarApps = Args.parse(args);
 
     if (!maybeJarApps.isPresent()) {
-      System.out.println("usage: [<jar> [-Dkey=value]... -- [<arg>]... --]...");
+      System.out.println("usage: [<jar> [-ready <check>]... [-Dkey=value]... -- [<arg>]... --]...");
       System.exit(EXIT_USAGE);
       return;
     }
@@ -61,6 +62,16 @@ public class App {
     System.setProperties(threadGroupProperties);
 
     for (final LoadedJarApp entry : entries) {
+      for (final ReadinessCheck readinessCheck : entry.jarApp.readinessChecks) {
+        try {
+          readinessCheck.waitUntilReady();
+        } catch (Exception e) {
+          e.printStackTrace();
+
+          System.exit(EXIT_READINESS_CHECK_FAILED);
+        }
+      }
+
       final ThreadGroup jarThreadGroup = new ThreadGroup(threadGroupName(entry));
       final Thread jarThread =
           new Thread(
