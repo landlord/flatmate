@@ -7,10 +7,10 @@
 
 "Flatmate" runs one or more specified JAR files in the same JVM, each with different class loaders. This is done to reduce the memory usage of JVM-based applications that are deployed to the same machine.
 
-In essence, Flatmate delivers similar benefits to common [OSGI](https://www.osgi.org/) usage around saving memory. Flatmate is also similar in the goals of [Landlord](https://github.com/landlord/landlord) around the sharing of memory. However, unlike OSGi, both Flatmate and Landlord share an important goal of being able to take two or more JVM applications and host them as one without change. Unlike Landlord and OSGi, Flatmate does not provide any dynamic loading/unloading behavior. Since developing Landlord, we concluded that the JVM needs to provide process-style isolation to better support it and OSGi; perhaps akin to [Isolates](https://en.wikipedia.org/wiki/Application_Isolation_API). 
+In essence, Flatmate delivers similar benefits to common [OSGI](https://www.osgi.org/) usage around saving memory. Flatmate is also similar in the goals of [Landlord](https://github.com/landlord/landlord) around the sharing of memory. However, unlike OSGi, both Flatmate and Landlord share an important goal of being able to take two or more JVM applications and host them as one without change. Unlike Landlord and OSGi, Flatmate does not provide any dynamic loading/unloading behavior. Since developing Landlord, we concluded that the JVM needs to provide process-style isolation to better support it and OSGi; perhaps akin to [Isolates](https://en.wikipedia.org/wiki/Application_Isolation_API).
 
 Flatmate is free from third-party dependencies and written in pure Java with the aim of limiting its memory footprint.
- 
+
 Pro-tip: To further reduce memory usage, consider using [OpenJ9](https://www.eclipse.org/openj9/) and its class data sharing feature, particularly if the specified JARs have similar dependencies.
 
 ## Usage
@@ -51,6 +51,19 @@ java -jar ~/work/farmco/roommate/target/flatmate-1.0.0-SNAPSHOT.jar \
 ```bash
 sbt package
 ```
+## Changelog
+
+### 0.2.0 - 2019-03-18
+
+* Add a readiness check feature to sequence application startup
+
+### 0.1.1 - 2019-12-11
+
+* Fix a bug causing stack overflow on startup
+
+### 0.1.0 - 2018-12-10
+
+* Initial release
 
 ## Contribution policy
 
