@@ -1,7 +1,7 @@
 # Flatmate [![build-badge][]][build]
 
-[build]:                 https://circleci.com/gh/titanclass/flatmate
-[build-badge]:           https://circleci.com/gh/titanclass/flatmate.svg?style=shield
+[build]:                 https://circleci.com/gh/landlord/flatmate
+[build-badge]:           https://circleci.com/gh/landlord/flatmate.svg?style=shield
 
 ## Overview
 
