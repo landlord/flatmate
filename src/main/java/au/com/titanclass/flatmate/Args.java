@@ -68,25 +68,35 @@ class Args {
             jarApp.properties.add(new AbstractMap.SimpleEntry<>(key, value));
           } else if (arg.startsWith("-ready") && argsIterator.hasNext()) {
             final String tcpScheme = "tcp://";
+            final String jndiNamePrefix = "jndi:";
             final String readinessCheck = argsIterator.next();
 
-            if (!readinessCheck.startsWith(tcpScheme)) {
+            if (readinessCheck.startsWith(tcpScheme)) {
+              System.out.println("Using tcpScheme: " + arg);
+              final String[] readinessCheckParts =
+                  readinessCheck.substring(tcpScheme.length()).split(":", 2);
+
+              if (readinessCheckParts.length != 2
+                  || readinessCheckParts[0].isEmpty()
+                  || !readinessCheckParts[1].matches("^[0-9]+$")) {
+                return Optional.empty();
+              }
+
+              jarApp.readinessChecks.add(
+                  new TcpReadinessCheck(
+                      readinessCheckParts[0], Integer.parseInt(readinessCheckParts[1])));
+            } else if (readinessCheck.startsWith(jndiNamePrefix)) {
+              System.out.println("Using jndiNamePrefix: " + readinessCheck);
+              final String jndiName = readinessCheck.substring(jndiNamePrefix.length());
+              jarApp.readinessChecks.add(new JndiReadinessCheck(jndiName));
+            } else {
+              System.out.println("Unknown readiness check type " + readinessCheck);
               return Optional.empty();
             }
 
-            final String[] readinessCheckParts =
-                readinessCheck.substring(tcpScheme.length()).split(":", 2);
-
-            if (readinessCheckParts.length != 2
-                || readinessCheckParts[0].isEmpty()
-                || !readinessCheckParts[1].matches("^[0-9]+$")) {
-              return Optional.empty();
-            }
-
-            jarApp.readinessChecks.add(
-                new TcpReadinessCheck(
-                    readinessCheckParts[0], Integer.parseInt(readinessCheckParts[1])));
           } else {
+            System.out.println("Unknown arg type " + arg);
+
             return Optional.empty();
           }
 
