@@ -16,14 +16,24 @@
 
 package au.com.titanclass.flatmate;
 
-import javax.naming.*;
-import javax.naming.spi.InitialContextFactory;
-import java.util.Hashtable;
+import org.junit.Test;
 
-/** A simple JNDI context factory which will create a <code>FlatmateContext</code> */
-public class FlatmateContextFactory implements InitialContextFactory {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-  public Context getInitialContext(Hashtable<?, ?> env) {
-    return new FlatmateContext();
+public class JndiReadinessCheckTests {
+  @Test
+  public void test() throws Exception {
+
+    final String testJndiName = "test-jndi-name";
+    final JndiReadinessCheck jndiReadinessCheck = new JndiReadinessCheck(testJndiName);
+
+    assertFalse(jndiReadinessCheck.isReady());
+
+    new FlatmateContext().bind(testJndiName, new Object());
+
+    jndiReadinessCheck.waitUntilReady();
+
+    assertTrue(jndiReadinessCheck.isReady());
   }
 }

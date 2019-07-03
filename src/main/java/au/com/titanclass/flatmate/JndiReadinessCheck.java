@@ -26,9 +26,13 @@ public class JndiReadinessCheck implements ReadinessCheck {
   private Context ctx;
   private String name;
 
+  /**
+   * A ReadinessCheck that waits until a named value is available in the <code>FlatmateContext
+   * </code> JNDI context
+   *
+   * @param name The name of the object to lookup
+   */
   JndiReadinessCheck(String name) {
-
-    System.out.println("Constructing Context for readiness check for " + name);
 
     this.name = name;
     Properties props = new Properties();
@@ -38,18 +42,14 @@ public class JndiReadinessCheck implements ReadinessCheck {
     try {
       ctx = new InitialContext(props);
     } catch (NamingException e) {
-      System.out.println("Naming exception " + e.getMessage());
+      System.err.println("Naming exception " + e.getMessage());
       e.printStackTrace();
+      System.exit(1);
     }
-
-    System.out.println("Initialising context in test-app-1");
   }
 
   @Override
   public boolean isReady() throws Exception {
-    System.out.println("Performing readiness check for " + name);
-    boolean result = ctx.lookup(name) != null;
-    System.out.println("Readiness check for " + name + " returned " + result);
-    return result;
+    return ctx.lookup(name) != null;
   }
 }
