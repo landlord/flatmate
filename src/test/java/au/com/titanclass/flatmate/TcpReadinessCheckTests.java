@@ -22,7 +22,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-public class ReadinessChecksTests {
+public class TcpReadinessCheckTests {
   @Test
   public void test() throws Exception {
     final long startTimeMs = System.nanoTime();
